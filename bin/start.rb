@@ -9,8 +9,11 @@ CHUNK_SIZE = 1000
 
 # Это чудовище работает, но выглядит абсолютно ужаснейшим образом и не тестируется
 
-file_index = 0
-File.open('input_data.txt') do |file|
+input_file = 'input_data.txt'
+output_file = "new_output.txt"
+
+tempfiles = []
+File.open(input_file) do |file|
   file.each_slice(CHUNK_SIZE) do |lines|
     transactions = []
     lines.each do |line|
@@ -19,22 +22,17 @@ File.open('input_data.txt') do |file|
 
     transactions = CustomSort.quicksort(transactions, :desc)
 
-    File.open("outputs/output_file_#{file_index}.txt", 'w') do |output_file|
-      transactions.each do |transac|
-        output_file.puts transac.to_s
-      end
-    end
+    tempfile = Tempfile.create(anonymous: true)
+    tempfiles << tempfile
 
-    file_index += 1
+    transactions.each do |transac|
+      tempfile.puts transac.to_s
+    end
   end
 end
 
-input_files = (0..(file_index - 1)).map { |i| "outputs/output_file_#{i}.txt" }
-output_file = "new_output.txt"
-
-file_handles = input_files.map { |fname| File.open(fname, "r") }
-current_lines = file_handles.map { |file| file.gets&.chomp }
-
+tempfiles.map(&:rewind)
+current_lines = tempfiles.map { |file| file.gets&.chomp }
 
 # Используем алгоритм External sorting
 
@@ -55,12 +53,13 @@ File.open(output_file, "w") do |out|
 
     out.puts current_lines[max_index]
 
-    next_line = file_handles[max_index].gets
+    next_line = tempfiles[max_index].gets
     current_lines[max_index] = next_line&.chomp
   end
 end
 
-file_handles.each(&:close)
+tempfiles.each(&:close)
+tempfiles.each(&:unlink)
 
 if TestTools.file_sorted?("new_output.txt", :desc) { |line| Transaction.parse(line.strip).amount }
   puts "Файл отсортирован!"

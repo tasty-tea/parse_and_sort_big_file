@@ -4,7 +4,7 @@ RSpec.describe CustomSort do
   let(:unsorted_array) { [3, 40, 21, 18, 25, 49, 24, 45, 39, 28] }
 
   context 'using default method' do
-    it 'quicksorts asc' do    
+    it 'quicksorts asc' do
       expect(CustomSort.quicksort(unsorted_array)).to eq([3, 18, 21, 24, 25, 28, 39, 40, 45, 49])
     end
 
@@ -14,7 +14,7 @@ RSpec.describe CustomSort do
   end
 
   context 'using specific methods' do
-    it 'quicksorts asc' do    
+    it 'quicksorts asc' do
       expect(CustomSort.quicksort_asc(unsorted_array)).to eq([3, 18, 21, 24, 25, 28, 39, 40, 45, 49])
     end
 

@@ -32,24 +32,31 @@ module ExternalSorting
 
     File.open(output_filename, "w") do |out|
       while current_lines.any? { |line| !line.nil? }
-        max_index = nil
-        max_amount = nil
-
-        current_lines.each_with_index do |line, idx|
-          next if line.nil?
-
-          amount = Transaction.parse(line.strip).amount
-          if max_amount.nil? || amount > max_amount
-            max_amount = amount
-            max_index = idx
-          end
-        end
-
+        max_index = find_max_index(current_lines)
         out.puts current_lines[max_index]
 
         next_line = input_files[max_index].gets
         current_lines[max_index] = next_line&.chomp
       end
     end
+  end
+
+  private
+
+  def find_max_index(lines)
+    max_index = nil
+    max_amount = nil
+
+    lines.each_with_index do |line, idx|
+      next if line.nil?
+
+      amount = Transaction.parse(line.strip).amount
+      if max_amount.nil? || amount > max_amount
+        max_amount = amount
+        max_index = idx
+      end
+    end
+
+    max_index
   end
 end

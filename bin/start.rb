@@ -16,9 +16,3 @@ tempfiles.map(&:rewind)
 ExternalSorting.create_output_file(output_file, tempfiles)
 
 tempfiles.each(&:close)
-
-if TestTools.file_sorted?("new_output.txt", :desc) { |line| Transaction.parse(line.strip).amount }
-  puts "Файл отсортирован!"
-else
-  puts "Файл не отсортирован!"
-end

@@ -1,5 +1,14 @@
+require_relative 'custom_sort'
+require_relative 'transaction'
+
 module ExternalSorting
   module_function
+
+  def sort_large_file(input_filename:, output_filename:, chunk_size: 1000)
+    tempfiles = create_sorted_tempfile_chunks(input_filename, chunk_size)
+
+    create_output_file(output_filename, tempfiles)
+  end
 
   def create_sorted_tempfile_chunks(input_filename, chunk_size, sorter: CustomSort, parser: Transaction)
     tempfiles = []

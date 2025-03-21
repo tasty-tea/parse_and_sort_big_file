@@ -28,6 +28,8 @@ class ExternalSorting
     File.open(input_filename) do |file|
       file.each_slice(chunk_size) do |lines|
         transactions = parse_transactions(lines, parser)
+        raise ArgumentError, 'Invalid transaction format' if transactions.any?(nil)
+
         transactions = sorter.quicksort(transactions, :desc)
 
         tempfiles << write_to_tempfile(transactions)

@@ -33,13 +33,28 @@ RSpec.describe Transaction do
   end
 
   describe '#parse' do
-    let(:input_line) { '2023-09-03T12:45:00Z,txn12345,user987,369.73' }
-    let(:transaction) do
-      Transaction.new(timestamp: '2023-09-03T12:45:00Z', transaction_id: 'txn12345', user_id: 'user987', amount: 369.73)
+    context 'when valid line' do
+      let(:input_line) { '2023-09-03T12:45:00Z,txn12345,user987,369.73' }
+      let(:transaction) do
+        Transaction.new(timestamp: '2023-09-03T12:45:00Z', transaction_id: 'txn12345', user_id: 'user987',
+                        amount: 369.73)
+      end
+
+      it 'parses input line' do
+        expect(Transaction.parse(input_line)).to eq(transaction)
+      end
     end
 
-    it 'parses input line' do
-      expect(Transaction.parse(input_line)).to eq(transaction)
+    context 'when invalid line' do
+      let(:input_line) { '2023-09-03T12:45:00Z,user987,369.73' }
+      let(:transaction) do
+        Transaction.new(timestamp: '2023-09-03T12:45:00Z', transaction_id: 'txn12345', user_id: 'user987',
+                        amount: 369.73)
+      end
+
+      it 'returns nil' do
+        expect(Transaction.parse(input_line)).to be nil
+      end
     end
   end
 end

@@ -1,4 +1,6 @@
 module TestTools
+  # Custom module to create a file with random transaction data and check if for being sorted
+
   module_function
 
   def fill_input_file(filename: 'input_data.txt', lines_count: 10_000)
@@ -12,7 +14,7 @@ module TestTools
   def file_sorted?(file_path, order = :asc)
     File.open(file_path, "r") do |file|
       first_line = file.gets
-      return true unless first_line
+      return false unless first_line
 
       prev_value = yield(first_line.chomp)
 

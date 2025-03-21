@@ -52,6 +52,7 @@ class ExternalSorting
     tempfile = Tempfile.new
     sorted_transactions.each { |t| tempfile.puts t.to_s }
     tempfile.close
+    transactions.clear
     sorted_transactions.clear
 
     # Yeah, it's manual GC call
@@ -59,10 +60,6 @@ class ExternalSorting
     # And script gets killed by system over memory overload
     ObjectSpace.garbage_collect
     tempfile
-  end
-
-  def parse_transactions(lines, parser)
-    lines.map { |line| parser.parse(line.strip) }
   end
 
   def multi_stage_merge(tempfiles, final_output_filename, parser: Transaction)

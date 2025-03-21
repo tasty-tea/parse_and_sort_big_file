@@ -14,12 +14,15 @@ RSpec.describe CustomSort do
   end
 
   context 'using specific methods' do
+    let(:asc_sorted_array) { [3, 18, 21, 24, 25, 28, 39, 40, 45, 49] }
+    let(:desc_sorted_array) { [49, 45, 40, 39, 28, 25, 24, 21, 18, 3] }
+
     it 'quicksorts asc' do
-      expect(CustomSort.quicksort_asc(unsorted_array)).to eq([3, 18, 21, 24, 25, 28, 39, 40, 45, 49])
+      expect(CustomSort.quicksort_asc(unsorted_array)).to eq(asc_sorted_array)
     end
 
     it 'quicksorts desc' do
-      expect(CustomSort.quicksort_desc(unsorted_array)).to eq([49, 45, 40, 39, 28, 25, 24, 21, 18, 3])
+      expect(CustomSort.quicksort_desc(unsorted_array)).to eq(desc_sorted_array)
     end
   end
 end

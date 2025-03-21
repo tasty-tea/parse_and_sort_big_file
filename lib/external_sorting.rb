@@ -6,11 +6,7 @@ module ExternalSorting
 
     File.open(input_filename) do |file|
       file.each_slice(chunk_size) do |lines|
-        transactions = []
-        lines.each do |line|
-          transactions << Transaction.parse(line.strip)
-        end
-
+        transactions = lines.map { |line| Transaction.parse(line.strip) }
         transactions = CustomSort.quicksort(transactions, :desc)
 
         tempfile = Tempfile.create(anonymous: true)
@@ -40,8 +36,6 @@ module ExternalSorting
       end
     end
   end
-
-  private
 
   def find_max_index(lines)
     max_index = nil

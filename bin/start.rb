@@ -8,11 +8,14 @@ require_relative '../lib/test_tools'
 
 CHUNK_SIZE = 1000
 
-input_file = 'input_data.txt'
-output_file = "new_output.txt"
+input_filename = 'input_data.txt'
+output_filename = "new_output.txt"
 
-tempfiles = ExternalSorting.create_sorted_tempfile_chunks(input_file, CHUNK_SIZE)
-tempfiles.map(&:rewind)
-ExternalSorting.create_output_file(output_file, tempfiles)
+begin
+  tempfiles = ExternalSorting.create_sorted_tempfile_chunks(input_filename, CHUNK_SIZE)
+  tempfiles.map(&:rewind)
 
-tempfiles.each(&:close)
+  ExternalSorting.create_output_file(output_filename, tempfiles)
+ensure
+  tempfiles&.each(&:close)
+end

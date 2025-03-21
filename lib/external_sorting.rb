@@ -53,13 +53,6 @@ class ExternalSorting
     tempfile = Tempfile.new
     sorted_transactions.each { |t| tempfile.puts t.to_s }
     tempfile.close
-    transactions.clear
-    sorted_transactions.clear
-
-    # Yeah, it's manual GC call
-    # For some reason it's not called automatically on my machine
-    # And script gets killed by system over memory overload
-    ObjectSpace.garbage_collect
     tempfile
   end
 
@@ -80,9 +73,7 @@ class ExternalSorting
 
   def merge_files(tempfiles, output_filename, parser: Transaction)
     # Let's try to prevent memory leak, we're going to juggle files
-    files = tempfiles.map do |tempfile|
-      File.open(tempfile.path)
-    end
+    files = tempfiles.map { |tempfile| File.open(tempfile.path) }
 
     current_lines = files.map { |file| file.gets&.chomp }
 

@@ -19,32 +19,12 @@ class ExternalSorting
   def call
     tempfiles = create_sorted_tempfile_chunks(@input_filename, @chunk_size)
 
-    puts 'are we happy yet?'
-
     multi_stage_merge(tempfiles, @output_filename)
   ensure
     cleanup_tempfiles(tempfiles)
   end
 
   private
-
-  # def create_sorted_tempfile_chunks(input_filename, chunk_size, sorter: CustomSort, parser: Transaction)
-  #   tempfiles = []
-
-  #   File.open(input_filename) do |file|
-  #     file.each_slice(chunk_size) do |lines|
-  #       transactions = parse_transactions(lines, parser)
-  #       raise ArgumentError, 'Invalid transaction format' if transactions.any?(nil)
-
-  #       transactions = sorter.quicksort(transactions, :desc)
-
-  #       tempfiles << write_to_tempfile(transactions)
-  #       nil
-  #     end
-  #   end
-
-  #   tempfiles
-  # end
 
   def create_sorted_tempfile_chunks(input_filename, chunk_size, sorter: CustomSort, parser: Transaction)
     tempfiles = []
@@ -58,10 +38,8 @@ class ExternalSorting
         buffer << parsed
         if buffer.size >= chunk_size
           tempfiles << write_sorted_chunk(buffer, sorter)
-          puts "BUFFER #{buffer.size}"
-          puts "TEMPFILES #{tempfiles.size}"
           buffer.clear
-        end        
+        end
       end
       tempfiles << write_sorted_chunk(buffer, sorter) unless buffer.empty?
     end
@@ -74,19 +52,18 @@ class ExternalSorting
     tempfile = Tempfile.new
     sorted_transactions.each { |t| tempfile.puts t.to_s }
     tempfile.close
+    sorted_transactions.clear
+
+    # Yeah, it's manual GC call
+    # For some reason it's not called automatically on my machine
+    # And script gets killed by system over memory overload
+    ObjectSpace.garbage_collect
     tempfile
   end
 
   def parse_transactions(lines, parser)
     lines.map { |line| parser.parse(line.strip) }
   end
-
-  # def write_to_tempfile(transactions)
-  #   tempfile = Tempfile.create(anonymous: true)
-  #   transactions.each { |transac| tempfile.puts transac.to_s }
-  #   tempfile.rewind
-  #   tempfile
-  # end
 
   def multi_stage_merge(tempfiles, final_output_filename, parser: Transaction)
     if tempfiles.size <= MAX_OPEN_FILES
@@ -111,7 +88,7 @@ class ExternalSorting
 
     current_lines = files.map { |file| file.gets&.chomp }
 
-    File.open(output_filename, "w") do |out|          
+    File.open(output_filename, "w") do |out|
       while current_lines.any? { |line| !line.nil? }
         max_index = find_max_index(current_lines, parser)
         out.puts current_lines[max_index]

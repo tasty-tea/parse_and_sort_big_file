@@ -1,3 +1,4 @@
+require 'tempfile'
 require_relative 'custom_sort'
 require_relative 'transaction'
 
